@@ -108,7 +108,7 @@ ewman run postman_collections/FakeStoreAPI_Products.postman_collection.json (**1
 ewman run postman_collections/FakeStoreAPI_Carts.postman_collection.json (**11/11 passed**)
 
 ### Единый запуск всех автотестов:
-`ash
+`Bash
 python -m pytest autotests_api autotests_web -v
 `
 **Итог: 38 passed in 13.37s**
