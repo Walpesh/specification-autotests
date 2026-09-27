@@ -1,0 +1,484 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #2b2d42;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .window {
+      background-color: #383a59;
+      width: 100%;
+      max-width: 460px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .browser-bar {
+      background-color: #44475a;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .browser-url {
+      flex: 1;
+      background-color: #fff;
+      color: #333;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .close-btn {
+      color: #ccc;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .form-container {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .field-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .field-row {
+      display: flex;
+      gap: 10px;
+    }
+    .field-row .field-wrapper {
+      flex: 1;
+    }
+    .field-row .field-wrapper.day {
+      flex: 0.9;
+    }
+    .field-row .field-wrapper.month {
+      flex: 1.2;
+    }
+    .field-row .field-wrapper.year {
+      flex: 1.1;
+    }
+    .input-box {
+      position: relative;
+      background-color: #4a4d6b;
+      border: 1px solid #5a5d7d;
+      border-radius: 4px;
+      height: 48px;
+      transition: border-color 0.2s;
+    }
+    .input-box.active {
+      border: 2px solid #305BAB !important;
+    }
+    .input-box.error {
+      border-color: #ff5555;
+    }
+    .floating-label {
+      position: absolute;
+      left: 12px;
+      top: 14px;
+      color: #b0b4c8;
+      font-size: 14px;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .floating-label.lifted {
+      top: -10px;
+      left: 8px;
+      font-size: 11px;
+      background-color: #383a59;
+      padding: 0 4px;
+      color: #e0e0e0;
+      font-weight: 500;
+    }
+    .asterisk {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      color: #ffffff;
+      font-size: 14px;
+      pointer-events: none;
+    }
+    input, select {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      padding: 0 28px 0 12px;
+      font-size: 14px;
+    }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    select option {
+      background-color: #383a59;
+      color: #fff;
+    }
+    .dropdown-arrow {
+      position: absolute;
+      right: 12px;
+      top: 18px;
+      width: 0; 
+      height: 0; 
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #fff;
+      pointer-events: none;
+    }
+    .error-msg {
+      color: #ff8080;
+      font-size: 11px;
+      margin-top: 3px;
+      display: none;
+    }
+    .error-msg.visible {
+      display: block;
+    }
+    .btn-submit {
+      width: 100%;
+      height: 44px;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: not-allowed;
+      transition: background-color 0.25s;
+      background-color: #B0B0B0;
+      color: #ffffff;
+      margin-top: 10px;
+    }
+    .btn-submit.active {
+      background-color: #2DC75C;
+      cursor: pointer;
+    }
+    .success-alert {
+      display: none;
+      background-color: #2DC75C;
+      color: #fff;
+      padding: 12px;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .success-alert.visible {
+      display: block;
+    }
+    /* Responsive Media Queries */
+    @media (max-width: 480px) {
+      .window {
+        max-width: 100%;
+      }
+      .form-container {
+        padding: 16px;
+      }
+      .field-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="window">
+  <div class="browser-bar">
+    <span>←</span>
+    <span>⟳</span>
+    <div class="browser-url">https://test/registr</div>
+    <span class="close-btn">✕</span>
+  </div>
+
+  <form id="regForm" class="form-container" novalidate>
+    <div id="successMsg" class="success-alert">Регистрация успешно пройдена!</div>
+
+    <!-- Логин -->
+    <div class="field-wrapper">
+      <div class="input-box" id="box-login">
+        <label id="label-login" class="floating-label" for="login">Логин</label>
+        <span class="asterisk">*</span>
+        <input type="text" id="login" name="login" autocomplete="off" />
+      </div>
+      <div id="err-login" class="error-msg"></div>
+    </div>
+
+    <!-- Пароль -->
+    <div class="field-wrapper">
+      <div class="input-box" id="box-password">
+        <label id="label-password" class="floating-label" for="password">Пароль</label>
+        <span class="asterisk">*</span>
+        <input type="password" id="password" name="password" />
+      </div>
+      <div id="err-password" class="error-msg"></div>
+    </div>
+
+    <!-- Повторите пароль -->
+    <div class="field-wrapper">
+      <div class="input-box" id="box-confirmPassword">
+        <label id="label-confirmPassword" class="floating-label" for="confirmPassword">Повторите пароль</label>
+        <span class="asterisk">*</span>
+        <input type="password" id="confirmPassword" name="confirmPassword" />
+      </div>
+      <div id="err-confirmPassword" class="error-msg"></div>
+    </div>
+
+    <!-- Пол (select) -->
+    <div class="field-wrapper">
+      <div class="input-box" id="box-gender">
+        <label id="label-gender" class="floating-label" for="gender">Выберите пол</label>
+        <span class="dropdown-arrow"></span>
+        <select id="gender" name="gender">
+          <option value="" disabled selected></option>
+          <option value="male">Мужской</option>
+          <option value="female">Женский</option>
+        </select>
+      </div>
+      <div id="err-gender" class="error-msg"></div>
+    </div>
+
+    <!-- Почта -->
+    <div class="field-wrapper">
+      <div class="input-box" id="box-email">
+        <label id="label-email" class="floating-label" for="email">Почта</label>
+        <span class="asterisk">*</span>
+        <input type="text" id="email" name="email" autocomplete="off" />
+      </div>
+      <div id="err-email" class="error-msg"></div>
+    </div>
+
+    <!-- Дата рождения: День, Месяц, Год -->
+    <div class="field-row">
+      <!-- День -->
+      <div class="field-wrapper day">
+        <div class="input-box" id="box-birthDay">
+          <label id="label-birthDay" class="floating-label" for="birthDay">День</label>
+          <span class="asterisk">*</span>
+          <input type="text" id="birthDay" name="birthDay" maxlength="2" />
+        </div>
+        <div id="err-birthDay" class="error-msg"></div>
+      </div>
+
+      <!-- Месяц -->
+      <div class="field-wrapper month">
+        <div class="input-box" id="box-birthMonth">
+          <label id="label-birthMonth" class="floating-label" for="birthMonth">Месяц</label>
+          <span class="asterisk" style="right: 24px;">*</span>
+          <span class="dropdown-arrow"></span>
+          <select id="birthMonth" name="birthMonth">
+            <option value="" disabled selected></option>
+            <option value="1">Январь</option>
+            <option value="2">Февраль</option>
+            <option value="3">Март</option>
+            <option value="4">Апрель</option>
+            <option value="5">Май</option>
+            <option value="6">Июнь</option>
+            <option value="7">Июль</option>
+            <option value="8">Август</option>
+            <option value="9">Сентябрь</option>
+            <option value="10">Октябрь</option>
+            <option value="11">Ноябрь</option>
+            <option value="12">Декабрь</option>
+          </select>
+        </div>
+        <div id="err-birthMonth" class="error-msg"></div>
+      </div>
+
+      <!-- Год -->
+      <div class="field-wrapper year">
+        <div class="input-box" id="box-birthYear">
+          <label id="label-birthYear" class="floating-label" for="birthYear">Год</label>
+          <span class="asterisk">*</span>
+          <input type="text" id="birthYear" name="birthYear" maxlength="4" />
+        </div>
+        <div id="err-birthYear" class="error-msg"></div>
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit" disabled>Регистрация</button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('regForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const successMsg = document.getElementById('successMsg');
+
+  const fields = ['login', 'password', 'confirmPassword', 'gender', 'email', 'birthDay', 'birthMonth', 'birthYear'];
+
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    const box = document.getElementById('box-' + f);
+    const label = document.getElementById('label-' + f);
+
+    el.addEventListener('focus', () => {
+      box.classList.add('active');
+      label.classList.add('lifted');
+    });
+
+    el.addEventListener('blur', () => {
+      box.classList.remove('active');
+      if (!el.value) {
+        label.classList.remove('lifted');
+      }
+      validateField(f);
+      checkOverallValidity();
+    });
+
+    el.addEventListener('input', () => {
+      if (el.value) {
+        label.classList.add('lifted');
+      }
+      validateField(f);
+      checkOverallValidity();
+    });
+
+    el.addEventListener('change', () => {
+      if (el.value) {
+        label.classList.add('lifted');
+      }
+      validateField(f);
+      checkOverallValidity();
+    });
+  });
+
+  function validateLogin(val) {
+    if (!val) return 'Поле обязательно для заполнения';
+    if (val.length < 5) return 'Минимум 5 символов';
+    if (val.length > 20) return 'Максимум 20 символов';
+    // латиница, кириллица, _, -, @
+    const regex = /^[a-zA-Zа-яА-ЯёЁ_\-@]+$/;
+    if (!regex.test(val)) return 'Допустимы только латиница, кириллица и символы _, -, @';
+    return '';
+  }
+
+  function validatePassword(val) {
+    if (!val) return 'Поле обязательно для заполнения';
+    if (val.length < 6) return 'Минимум 6 символов';
+    if (val.length > 33) return 'Максимум 33 символа';
+    // латиница, кириллица, цифры и спец символы
+    const regex = /^[a-zA-Zа-яА-ЯёЁ0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/;
+    if (!regex.test(val)) return 'Недопустимые символы в пароле';
+    return '';
+  }
+
+  function validateConfirmPassword(val) {
+    if (!val) return 'Поле обязательно для заполнения';
+    const pwd = document.getElementById('password').value;
+    if (val !== pwd) return 'Пароли не совпадают';
+    return '';
+  }
+
+  function validateEmail(val) {
+    if (!val) return 'Поле обязательно для заполнения';
+    // Допускаются домены @mail, @gmail, @yandex.ru
+    // Общая валидация: username@(mail\.ru|mail\.com|gmail\.com|yandex\.ru) либо расширенно @mail.*
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(mail(\.[a-zA-Z]{2,})?|gmail\.com|yandex\.ru)$/i;
+    if (!emailRegex.test(val)) return 'Некорректная почта или неподдерживаемый домен (@mail, @gmail, @yandex.ru)';
+    return '';
+  }
+
+  function validateDay(val) {
+    if (!val) return 'Обязательное поле';
+    if (!/^\d{1,2}$/.test(val)) return 'Только цифры (1-2 знака)';
+    const d = parseInt(val, 10);
+    if (d < 1 || d > 31) return 'День от 1 до 31';
+    return '';
+  }
+
+  function validateMonth(val) {
+    if (!val) return 'Выберите месяц';
+    return '';
+  }
+
+  function validateYear(val) {
+    if (!val) return 'Обязательное поле';
+    if (!/^\d{4}$/.test(val)) return 'Ровно 4 цифры';
+    const y = parseInt(val, 10);
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - 90;
+    if (y < minYear) return `Максимальный возраст 90 лет (год от ${minYear})`;
+    if (y > currentYear) return 'Год не может быть в будущем';
+    return '';
+  }
+
+  function validateField(f) {
+    const el = document.getElementById(f);
+    const errEl = document.getElementById('err-' + f);
+    const box = document.getElementById('box-' + f);
+    let err = '';
+
+    if (f === 'login') err = validateLogin(el.value);
+    if (f === 'password') err = validatePassword(el.value);
+    if (f === 'confirmPassword') err = validateConfirmPassword(el.value);
+    if (f === 'email') err = validateEmail(el.value);
+    if (f === 'birthDay') err = validateDay(el.value);
+    if (f === 'birthMonth') err = validateMonth(el.value);
+    if (f === 'birthYear') err = validateYear(el.value);
+
+    if (errEl) {
+      if (err) {
+        errEl.innerText = err;
+        errEl.classList.add('visible');
+        box.classList.add('error');
+      } else {
+        errEl.innerText = '';
+        errEl.classList.remove('visible');
+        box.classList.remove('error');
+      }
+    }
+    return !err;
+  }
+
+  function checkOverallValidity() {
+    const isLoginValid = validateLogin(document.getElementById('login').value) === '';
+    const isPasswordValid = validatePassword(document.getElementById('password').value) === '';
+    const isConfirmValid = validateConfirmPassword(document.getElementById('confirmPassword').value) === '';
+    const isEmailValid = validateEmail(document.getElementById('email').value) === '';
+    const isDayValid = validateDay(document.getElementById('birthDay').value) === '';
+    const isMonthValid = validateMonth(document.getElementById('birthMonth').value) === '';
+    const isYearValid = validateYear(document.getElementById('birthYear').value) === '';
+
+    const allMandatoryValid = isLoginValid && isPasswordValid && isConfirmValid && isEmailValid && isDayValid && isMonthValid && isYearValid;
+
+    if (allMandatoryValid) {
+      submitBtn.classList.add('active');
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.classList.remove('active');
+      submitBtn.disabled = true;
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    checkOverallValidity();
+    if (!submitBtn.disabled) {
+      successMsg.classList.add('visible');
+    }
+  });
+</script>
+
+</body>
+</html>

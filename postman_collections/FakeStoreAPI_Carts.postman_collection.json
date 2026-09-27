@@ -1,0 +1,405 @@
+{
+  "info": {
+    "_postman_id": "e8ea7f05-0be9-4b46-85b2-502fe4c41921",
+    "name": "FakeStoreAPI - Carts",
+    "description": "Коллекция запросов и тестов для API Carts (FakeStoreAPI: https://fakestoreapi.com/docs#tag/Carts).\nСодержит проверки для GET, POST, PUT, PATCH, DELETE корзин, фильтрации по датам и пользователям.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://fakestoreapi.com",
+      "type": "string"
+    },
+    {
+      "key": "cartId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "2",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. GET All Carts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts"
+          ]
+        },
+        "description": "????????? ?????? ???? ?????? ?????????????."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is an array of carts', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.not.empty; });",
+              "pm.test('Cart structure contains required fields', function () { const jsonData = pm.response.json(); const cart = jsonData[0]; pm.expect(cart).to.have.property('id').that.is.a('number'); pm.expect(cart).to.have.property('userId').that.is.a('number'); pm.expect(cart).to.have.property('date').that.is.a('string'); pm.expect(cart).to.have.property('products').that.is.an('array'); });",
+              "pm.test('Response time is under 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. GET Single Cart by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts/{{cartId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "{{cartId}}"
+          ]
+        },
+        "description": "????????? ?????? ?????????? ??????? ?? ID."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Cart ID matches requested ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData.id).to.eql(parseInt(pm.variables.get('cartId'))); pm.expect(jsonData).to.have.property('userId'); pm.expect(jsonData).to.have.property('products').that.is.an('array'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. GET Carts with Limit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts?limit=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "3"
+            }
+          ]
+        },
+        "description": "??????????? ?????????? ?????? ?????????? limit=3."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Exactly 3 carts returned', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array'); pm.expect(jsonData.length).to.eql(3); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. GET Carts Sorted Descending",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts?sort=desc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "?????????? ?????? ?? ???????? ID (sort=desc)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Carts are sorted descending by ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData.length).to.be.above(1); for (let i = 0; i < jsonData.length - 1; i++) { pm.expect(jsonData[i].id).to.be.above(jsonData[i + 1].id); } });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. GET Carts in Date Range",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts?startdate=2019-12-10&enddate=2020-10-10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts"
+          ],
+          "query": [
+            {
+              "key": "startdate",
+              "value": "2019-12-10"
+            },
+            {
+              "key": "enddate",
+              "value": "2020-10-10"
+            }
+          ]
+        },
+        "description": "?????????? ?????? ?? ????????? ??? (startdate & enddate)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Carts within date range returned', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.not.empty; const start = new Date('2019-12-10'); const end = new Date('2020-10-10'); jsonData.forEach(cart => { const cartDate = new Date(cart.date); pm.expect(cartDate.getTime()).to.be.at.least(start.getTime()); pm.expect(cartDate.getTime()).to.be.at.most(end.getTime()); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. GET User Carts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts/user/{{userId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "user",
+            "{{userId}}"
+          ]
+        },
+        "description": "????????? ?????? ?????? ????????????? ???????????? (userId=2)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('All returned carts belong to target userId', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.not.empty; const expectedUserId = parseInt(pm.variables.get('userId')); jsonData.forEach(cart => { pm.expect(cart.userId).to.eql(expectedUserId); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. POST Create Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 5,\n  \"date\": \"2020-02-03\",\n  \"products\": [\n    {\n      \"productId\": 5,\n      \"quantity\": 1\n    },\n    {\n      \"productId\": 1,\n      \"quantity\": 5\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/carts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts"
+          ]
+        },
+        "description": "???????? ????? ??????? ? ???????? (POST)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201 Created', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+              "pm.test('Response returns created cart with generated ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.have.property('id'); pm.expect(jsonData.userId).to.eql(5); pm.expect(jsonData.products).to.be.an('array').with.lengthOf(2); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. PUT Update Cart",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 3,\n  \"date\": \"2019-12-10\",\n  \"products\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 3\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/carts/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "7"
+          ]
+        },
+        "description": "?????? ?????? ??????????? ??????? (PUT)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Cart products replaced successfully', function () { const jsonData = pm.response.json(); pm.expect(jsonData.userId).to.eql(3); pm.expect(jsonData.products).to.be.an('array').with.lengthOf(1); pm.expect(jsonData.products[0].productId).to.eql(1); pm.expect(jsonData.products[0].quantity).to.eql(3); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. PATCH Update Cart (Partial)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 4\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/carts/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "7"
+          ]
+        },
+        "description": "????????? ?????????? ??????? (????????? userId) (PATCH)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Updated userId returned', function () { const jsonData = pm.response.json(); pm.expect(jsonData.userId).to.eql(4); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. DELETE Cart",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts/6",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "6"
+          ]
+        },
+        "description": "???????? ??????? ?? ID (DELETE)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Deleted cart returned', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.have.property('id'); pm.expect(jsonData.id).to.eql(6); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. GET User Carts for Non-existent User (Edge Case)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/carts/user/9999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "carts",
+            "user",
+            "9999"
+          ]
+        },
+        "description": "?????? ?????? ??? ??????????????? ???????????? userId=9999 (???????? ?????? ???????)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Returns empty array for non-existent user carts', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.empty; });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

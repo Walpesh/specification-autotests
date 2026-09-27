@@ -1,0 +1,137 @@
+# Выполненное тестовое задание (QA Engineer / QA Automation)
+
+**Кандидат:** Жихарев Вячеслав Евгеньевич  
+**Специальность:** Специалист по информационным системам  
+**GitHub:** [https://github.com/Walpesh](https://github.com/Walpesh)
+
+---
+
+## Описание выполненной работы
+
+В рамках тестового задания выполнены все требования спецификации (Frontend, Backend, UI/UX), а также разработаны два независимых набора автоматизированных тестов.
+
+---
+
+## Структура проекта
+
+`	ext
+Testovoe/
+├── postman_collections/
+│   ├── FakeStoreAPI_Products.postman_collection.json  # 11 запросов и 25 assertions для Products
+│   └── FakeStoreAPI_Carts.postman_collection.json     # 11 запросов и 24 assertions для Carts
+├── test_cases/
+│   ├── Тест_кейсы_Регистрация.xlsx                   # Таблица тест-кейсов со стилями (53 кейса)
+│   ├── Тест_кейсы_Регистрация.docx                   # Документ Word с описанием требований и таблицей
+│   └── Test_Cases_Registration.md                    # Документация в формате Markdown
+├── autotests_api/
+│   └── test_fakestore_api.py                         # 22 автотеста pytest (Products & Carts)
+├── autotests_web/
+│   └── test_registration_ui.py                      # 16 UI-автотестов Selenium WebDriver (Edge/Chromium)
+├── web_mock/
+│   └── index.html                                    # Интерактивная форма по макету с полной логикой
+├── Тестовое_задание_Жихарев_ВЕ.zip                  # Полный архив выполненного задания
+└── README.md
+`
+
+---
+
+## Часть 1. Frontend: Тест-кейсы для страницы регистрации
+
+Разработано **53 тест-кейса** (позитивные, негативные, граничные значения, UI/UX, адаптивность, сквозные E2E сценарии), охватывающие 100% требований из ТЗ:
+
+1. **Логин (\*)**:
+   - Минимум 5 символов, максимум 20 символов.
+   - Разрешены латиница, кириллица, спецсимволы _, -, @.
+   - Граничные проверки: 4, 5, 20, 21 символ, запрещенные спецсимволы, пустое поле.
+2. **Пароль (\*)**:
+   - Длина от 6 до 33 символов.
+   - Латиница, кириллица, цифры, спецсимволы.
+   - Проверки на скрытие символов, граничные длины 5, 6, 33, 34 символа.
+3. **Повторите пароль (\*)**:
+   - Идентичность паролю, проверка чувствительности к регистру, пустое значение.
+4. **Выберите пол (select)**:
+   - Выпадающий список ровно с 2 опциями («Мужской», «Женский»), выбор одной опции.
+5. **Почта (\*)**:
+   - Допустимые домены: @mail, @gmail, @yandex.ru.
+   - Валидация формата RFC, негативные проверки на иные домены и синтаксические ошибки.
+6. **Дата рождения: День (\*)**:
+   - От 1 до 2 цифр (1..31), запрет букв и спецсимволов.
+7. **Дата рождения: Месяц (select) (\*)**:
+   - Выпадающий список ровно с 12 календарными месяцами.
+8. **Дата рождения: Год (\*) и Максимальный возраст 90 лет**:
+   - Ровно 4 цифры.
+   - Ограничение возраста: ровно 90 лет (текущий год - 90 разрешен, старше 90 — ошибка).
+   - Запрет будущих лет и нецифровых символов.
+9. **UI/UX и Адаптивность**:
+   - Подсветка активного поля border темно-синим цветом #305BAB.
+   - Floating label (наименование активного поля плавно уходит наверх).
+   - Обозначение обязательных полей звездочкой *.
+   - Кнопка «Регистрация»: цвет #B0B0B0 (серый) при неполной/невалидной форме, меняется на #2DC75C (зеленый) только при валидности всех обязательных полей. Возврат в серый цвет при удалении данных.
+   - Адаптивность для Mobile (375x667, 390x844), Tablet (768x1024), Desktop (1920x1080).
+
+Форматы предоставления:
+- **Excel (Тест_кейсы_Регистрация.xlsx)**
+- **Word (Тест_кейсы_Регистрация.docx)**
+- **Markdown (Test_Cases_Registration.md)**
+
+---
+
+## Часть 2. Backend: Postman-коллекции для FakeStoreAPI
+
+Составлены и экспортированы 2 коллекции запросов в формате Postman Collection v2.1.0 со встроенными JavaScript-тестами (pm.test, проверки статус-кодов, JSON Schema, времени ответа, валидации возвращаемых данных):
+
+1. **postman_collections/FakeStoreAPI_Products.postman_collection.json**
+   - GET /products — Получение всех товаров (20+ записей, проверка структуры).
+   - GET /products/:id — Получение товара по ID.
+   - GET /products?limit=5 — Пагинация/лимит.
+   - GET /products?sort=desc — Сортировка по убыванию.
+   - GET /products/categories — Все категории товаров.
+   - GET /products/category/:category — Фильтрация по категории (jewelery).
+   - POST /products — Создание товара (проверка генерации ID).
+   - PUT /products/:id — Полное обновление товара.
+   - PATCH /products/:id — Частичное обновление товара.
+   - DELETE /products/:id — Удаление товара.
+   - GET /products/category/non_existing — Edge-case запрос несуществующей категории.
+   - **Newman: 11 requests, 25 assertions, 0 failed.**
+
+2. **postman_collections/FakeStoreAPI_Carts.postman_collection.json**
+   - GET /carts — Получение всех корзин.
+   - GET /carts/:id — Получение корзины по ID.
+   - GET /carts?limit=3 — Лимит корзин.
+   - GET /carts?sort=desc — Сортировка корзин по убыванию ID.
+   - GET /carts?startdate=...&enddate=... — Фильтрация по датам.
+   - GET /carts/user/:userId — Получение корзин пользователя.
+   - POST /carts — Создание новой корзины.
+   - PUT /carts/:id — Полное обновление корзины.
+   - PATCH /carts/:id — Частичное обновление корзины.
+   - DELETE /carts/:id — Удаление корзины.
+   - GET /carts/user/9999 — Edge-case запрос для несуществующего пользователя.
+   - **Newman: 11 requests, 24 assertions, 0 failed.**
+
+---
+
+## Часть 3. Автоматизированные тесты (pytest + selenium + newman)
+
+Всего разработано и успешно запущено **38 автоматизированных тестов Python** + **22 запроса (49 assertions) в Postman/Newman**:
+
+### 1. API Автотесты (utotests_api/test_fakestore_api.py)
+- Запуск: python -m pytest autotests_api/test_fakestore_api.py -v
+- Результат: **22 passed**
+
+### 2. UI Автотесты формы регистрации (utotests_web/test_registration_ui.py)
+- Запуск: python -m pytest autotests_web/test_registration_ui.py -v
+- Использует реальный браузер через Selenium WebDriver (в режиме headless).
+- Проверяет все валидации полей, граничные значения, максимальный возраст 90 лет, поведение floating label, подсветку border #305BAB, активность и смену цвета кнопки на зеленый #2DC75C.
+- Результат: **16 passed**
+
+### 3. Newman CLI тесты Postman-коллекций
+- 
+ewman run postman_collections/FakeStoreAPI_Products.postman_collection.json (**11/11 passed**)
+- 
+ewman run postman_collections/FakeStoreAPI_Carts.postman_collection.json (**11/11 passed**)
+
+### Единый запуск всех автотестов:
+`ash
+python -m pytest autotests_api autotests_web -v
+`
+**Итог: 38 passed in 13.37s**

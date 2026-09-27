@@ -1,0 +1,397 @@
+{
+  "info": {
+    "_postman_id": "5f90146f-a729-4457-8985-b69b7aaabd10",
+    "name": "FakeStoreAPI - Products",
+    "description": "Коллекция запросов и тестов для API Products (FakeStoreAPI: https://fakestoreapi.com/docs#tag/Products).\nСодержит проверки для GET, POST, PUT, PATCH, DELETE, фильтрации и пагинации.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://fakestoreapi.com",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "createdProductId",
+      "value": "21",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. GET All Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ]
+        },
+        "description": "????????? ??????? ?????? ???? ???????."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is an array with items', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.not.empty; pm.expect(jsonData.length).to.be.at.least(20); });",
+              "pm.test('Each product has required schema fields', function () { const jsonData = pm.response.json(); const first = jsonData[0]; pm.expect(first).to.have.property('id').that.is.a('number'); pm.expect(first).to.have.property('title').that.is.a('string'); pm.expect(first).to.have.property('price'); pm.expect(first).to.have.property('category').that.is.a('string'); pm.expect(first).to.have.property('rating').that.is.an('object'); });",
+              "pm.test('Response time is under 2000ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. GET Single Product by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        },
+        "description": "????????? ????????? ?????????? ? ?????????? ?????? ?? ??? ID."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Product ID matches requested ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData.id).to.eql(parseInt(pm.variables.get('productId'))); });",
+              "pm.test('Product has valid title and price', function () { const jsonData = pm.response.json(); pm.expect(jsonData.title).to.be.a('string').and.not.be.empty; pm.expect(jsonData.price).to.be.a('number').and.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. GET Products with Limit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products?limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "description": "??????????? ?????????? ???????????? ??????? ?????????? limit=5."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Exactly 5 products returned', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array'); pm.expect(jsonData.length).to.eql(5); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. GET Products Sorted Descending",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products?sort=desc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "?????????? ??????? ? ??????? ???????? (sort=desc)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Products are sorted descending by ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData.length).to.be.above(1); for (let i = 0; i < jsonData.length - 1; i++) { pm.expect(jsonData[i].id).to.be.above(jsonData[i + 1].id); } });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. GET All Product Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/categories",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "categories"
+          ]
+        },
+        "description": "????????? ?????? ???? ????????? ????????? ???????."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Categories is array of strings with known categories', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array'); pm.expect(jsonData).to.include.members(['electronics', 'jewelery', \"men's clothing\", \"women's clothing\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. GET Products by Category",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/category/jewelery",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "category",
+            "jewelery"
+          ]
+        },
+        "description": "?????????? ??????? ?? ???????????? ????????? (jewelery)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('All returned products belong to jewelery category', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.not.empty; jsonData.forEach(item => { pm.expect(item.category).to.eql('jewelery'); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. POST Create Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"QA Test Wireless Headphones\",\n  \"price\": 99.99,\n  \"description\": \"High fidelity noise-cancelling headphones for testing.\",\n  \"image\": \"https://i.pravatar.cc/300\",\n  \"category\": \"electronics\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ]
+        },
+        "description": "?????????? ?????? ?????? ? ??????? (POST)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 or 201 Created', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+              "pm.test('Response returns created product with generated ID', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.have.property('id'); pm.expect(jsonData.id).to.be.a('number'); pm.expect(jsonData.title).to.eql('QA Test Wireless Headphones'); pm.expect(jsonData.price).to.eql(99.99); pm.expect(jsonData.category).to.eql('electronics'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. PUT Update Product (Full)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"QA Test Wireless Headphones Updated\",\n  \"price\": 129.99,\n  \"description\": \"Updated version 2.0 with spatial audio.\",\n  \"image\": \"https://i.pravatar.cc/300\",\n  \"category\": \"electronics\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "7"
+          ]
+        },
+        "description": "?????? ?????????? ????????????? ?????? ?? ID (PUT)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Product details updated successfully', function () { const jsonData = pm.response.json(); pm.expect(jsonData.title).to.eql('QA Test Wireless Headphones Updated'); pm.expect(jsonData.price).to.eql(129.99); pm.expect(jsonData.description).to.eql('Updated version 2.0 with spatial audio.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. PATCH Update Product (Partial)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": 89.99\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/7",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "7"
+          ]
+        },
+        "description": "????????? ?????????? ?????? (????????? ?????? ????) (PATCH)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Updated field is returned correctly', function () { const jsonData = pm.response.json(); pm.expect(jsonData.price).to.eql(89.99); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. DELETE Product",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/6",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "6"
+          ]
+        },
+        "description": "???????? ?????? ?? ID (DELETE)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Deleted product returned in response', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.have.property('id'); pm.expect(jsonData.id).to.eql(6); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. GET Non-existent Category (Edge Case)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/category/non_existing_category_xyz",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "category",
+            "non_existing_category_xyz"
+          ]
+        },
+        "description": "?????? ??????? ?? ?????????????? ????????? (???????? ?????? ???????)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Returns empty array for non-existent category', function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.be.an('array').that.is.empty; });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
