@@ -12,29 +12,6 @@
 
 ---
 
-## Структура проекта
-
-`	ext
-Testovoe/
-├── postman_collections/
-│   ├── FakeStoreAPI_Products.postman_collection.json  # 11 запросов и 25 assertions для Products
-│   └── FakeStoreAPI_Carts.postman_collection.json     # 11 запросов и 24 assertions для Carts
-├── test_cases/
-│   ├── Тест_кейсы_Регистрация.xlsx                   # Таблица тест-кейсов со стилями (53 кейса)
-│   ├── Тест_кейсы_Регистрация.docx                   # Документ Word с описанием требований и таблицей
-│   └── Test_Cases_Registration.md                    # Документация в формате Markdown
-├── autotests_api/
-│   └── test_fakestore_api.py                         # 22 автотеста pytest (Products & Carts)
-├── autotests_web/
-│   └── test_registration_ui.py                      # 16 UI-автотестов Selenium WebDriver (Edge/Chromium)
-├── web_mock/
-│   └── index.html                                    # Интерактивная форма по макету с полной логикой
-├── Тестовое_задание_Жихарев_ВЕ.zip                  # Полный архив выполненного задания
-└── README.md
-`
-
----
-
 ## Часть 1. Frontend: Тест-кейсы для страницы регистрации
 
 Разработано **53 тест-кейса** (позитивные, негативные, граничные значения, UI/UX, адаптивность, сквозные E2E сценарии), охватывающие 100% требований из ТЗ:
